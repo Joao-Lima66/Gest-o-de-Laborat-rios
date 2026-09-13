@@ -17,8 +17,26 @@ public class LaboratorioServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<Laboratorio> lista = laboratorioDAO.listarTodos();
+        String action = req.getParameter("action");
+        String idParam = req.getParameter("id");
+        String busca = req.getParameter("busca");
+
+        if ("excluir".equals(action) && idParam != null) {
+            Long id = Long.parseLong(idParam);
+            laboratorioDAO.excluir(id);
+            resp.sendRedirect(req.getContextPath() + "/laboratorios");
+            return;
+        }
+
+        List<Laboratorio> lista;
+        if (busca != null && !busca.trim().isEmpty()) {
+            lista = laboratorioDAO.buscarPorNome(busca);
+        } else {
+            lista = laboratorioDAO.listarTodos();
+        }
+
         req.setAttribute("laboratorios", lista);
+        req.setAttribute("busca", busca);
         req.getRequestDispatcher("/laboratorios.jsp").forward(req, resp);
     }
 

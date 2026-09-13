@@ -14,6 +14,7 @@
         <a href="${pageContext.request.contextPath}/equipamentos" class="btn btn-outline-secondary">Ir para Equipamentos</a>
     </div>
 
+    <!-- Form de Cadastro -->
     <div class="card mb-4 shadow-sm">
         <div class="card-header bg-primary text-white">Cadastrar Laboratório</div>
         <div class="card-body">
@@ -33,14 +34,28 @@
         </div>
     </div>
 
+    <!-- Barra de Pesquisa e Tabela -->
     <div class="card shadow-sm">
         <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <form action="${pageContext.request.contextPath}/laboratorios" method="get" class="d-flex gap-2">
+                        <input type="text" name="busca" class="form-control" placeholder="Pesquisar por nome..." value="${busca}">
+                        <button type="submit" class="btn btn-outline-primary">Buscar</button>
+                        <c:if test="${not empty busca}">
+                            <a href="${pageContext.request.contextPath}/laboratorios" class="btn btn-outline-secondary">Limpar</a>
+                        </c:if>
+                    </form>
+                </div>
+            </div>
+
             <table class="table table-striped table-hover align-middle">
                 <thead class="table-dark">
                     <tr>
                         <th>ID</th>
                         <th>Nome</th>
                         <th>Bloco</th>
+                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,6 +64,13 @@
                             <td>${item.id}</td>
                             <td>${item.nome}</td>
                             <td>${item.bloco}</td>
+                            <td class="text-end">
+                                <a href="${pageContext.request.contextPath}/laboratorios?action=excluir&id=${item.id}" 
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Deseja realmente excluir o laboratorio ${item.nome}?');">
+                                   Excluir
+                                </a>
+                            </td>
                         </tr>
                     </c:forEach>
                 </tbody>

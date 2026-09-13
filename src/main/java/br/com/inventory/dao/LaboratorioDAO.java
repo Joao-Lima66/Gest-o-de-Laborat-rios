@@ -41,4 +41,34 @@ public class LaboratorioDAO {
             em.close();
         }
     }
+
+    public void excluir(Long id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Laboratorio lab = em.find(Laboratorio.class, id);
+            if (lab != null) {
+                em.remove(lab);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public List<Laboratorio> buscarPorNome(String termo) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            return em.createQuery("SELECT l FROM Laboratorio l WHERE LOWER(l.nome) LIKE LOWER(:termo)", Laboratorio.class)
+                     .setParameter("termo", "%" + termo + "%")
+                     .getResultList();
+        } finally {
+            em.close();
+        }
+    }
 }

@@ -25,8 +25,37 @@ public class EquipamentoDAO {
     public List<Equipamento> listarTodos() {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            // JOIN FETCH carrega o objeto Laboratorio vinculado sem erros de lazy loading
             return em.createQuery("SELECT e FROM Equipamento e JOIN FETCH e.laboratorio", Equipamento.class)
+                     .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    public void excluir(Long id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Equipamento equip = em.find(Equipamento.class, id);
+            if (equip != null) {
+                em.remove(equip);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public List<Equipamento> buscarPorTermo(String termo) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            return em.createQuery("SELECT e FROM Equipamento e JOIN FETCH e.laboratorio WHERE LOWER(e.tipo) LIKE LOWER(:termo) OR LOWER(e.numeroSerie) LIKE LOWER(:termo)", Equipamento.class)
+                     .setParameter("termo", "%" + termo + "%")
                      .getResultList();
         } finally {
             em.close();

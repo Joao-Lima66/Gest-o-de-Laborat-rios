@@ -21,8 +21,9 @@ public class EquipamentoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
+        String idParam = req.getParameter("id");
+        String busca = req.getParameter("busca");
 
-        // Se for chamada para tela de cadastro, busca os laboratórios para o <select>
         if ("novo".equals(action)) {
             List<Laboratorio> laboratorios = laboratorioDAO.listarTodos();
             req.setAttribute("laboratorios", laboratorios);
@@ -30,9 +31,22 @@ public class EquipamentoServlet extends HttpServlet {
             return;
         }
 
-        // Caso padrão: listagem de todos os equipamentos
-        List<Equipamento> equipamentos = equipamentoDAO.listarTodos();
+        if ("excluir".equals(action) && idParam != null) {
+            Long id = Long.parseLong(idParam);
+            equipamentoDAO.excluir(id);
+            resp.sendRedirect(req.getContextPath() + "/equipamentos");
+            return;
+        }
+
+        List<Equipamento> equipamentos;
+        if (busca != null && !busca.trim().isEmpty()) {
+            equipamentos = equipamentoDAO.buscarPorTermo(busca);
+        } else {
+            equipamentos = equipamentoDAO.listarTodos();
+        }
+
         req.setAttribute("equipamentos", equipamentos);
+        req.setAttribute("busca", busca);
         req.getRequestDispatcher("/equipamentos.jsp").forward(req, resp);
     }
 
@@ -42,7 +56,6 @@ public class EquipamentoServlet extends HttpServlet {
         String tipo = req.getParameter("tipo");
         Long laboratorioId = Long.parseLong(req.getParameter("laboratorioId"));
 
-        // Recupera a entidade completa pelo ID antes de associar ao Equipamento
         Laboratorio lab = laboratorioDAO.buscarPorId(laboratorioId);
 
         Equipamento equip = new Equipamento();
